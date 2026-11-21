@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mi Simulador de Stock</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="js/main.js" defer></script>
+  </head>
+  <body>
+    <div class="contenedor">
+      <h1>Mi Simulador de Stock</h1>
+
+      <div class="formulario">
+        <input
+          type="text"
+          id="input-nombre"
+          placeholder="Nombre del producto"
+        />
+        <input type="number" id="input-precio" placeholder="Precio" />
+        <button id="boton-agregar">+ Agregar</button>
+      </div>
+
+      <input type="text" id="input-buscador" placeholder="Buscar producto..." />
+
+      <p id="mensaje-feedback"></p>
+
+      <div id="contenedor-items"></div>
+    </div>
+  </body>
+</html>
