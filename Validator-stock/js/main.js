@@ -5,23 +5,41 @@ const botonAgregar = document.getElementById("boton-agregar");
 const inputBuscador = document.getElementById("input-buscador");
 const mensajeFeedback = document.getElementById("mensaje-feedback");
 
-let productos = [
+const CLAVE_STORAGE = "productosStock";
+
+function guardarEnStorage(lista) {
+  localStorage.setItem(CLAVE_STORAGE, JSON.stringify(lista));
+}
+
+function cargarDesdeStorage() {
+  const datosGuardados = localStorage.getItem(CLAVE_STORAGE);
+  return datosGuardados ? JSON.parse(datosGuardados) : null;
+}
+
+let productos = cargarDesdeStorage() ?? [
   { id: 1, nombre: "Yerba", precio: 2500 },
   { id: 2, nombre: "Arroz", precio: 1800 },
   { id: 3, nombre: "Jabón", precio: 900 },
 ];
 
+function mostrarFeedback(mensaje, esError) {
+  mensajeFeedback.textContent = mensaje;
+  mensajeFeedback.style.color = esError ? "#e74c3c" : "#27ae60";
+}
+
 function renderizarProductos(lista) {
   contenedorItems.innerHTML = "";
 
   for (const producto of lista) {
+    const { id, nombre, precio } = producto;
+
     contenedorItems.innerHTML += `
-      <div class="item-producto" data-id="${producto.id}">
+      <div class="item-producto" data-id="${id}">
         <div>
-          <h3>${producto.nombre}</h3>
-          <p>$${producto.precio}</p>
+          <h3>${nombre}</h3>
+          <p>$${precio}</p>
         </div>
-        <button class="boton-eliminar" data-id="${producto.id}">Eliminar</button>
+        <button class="boton-eliminar" data-id="${id}">Eliminar</button>
       </div>
     `;
   }
@@ -34,8 +52,7 @@ botonAgregar.addEventListener("click", () => {
   const precioNuevo = parseFloat(inputPrecio.value);
 
   if (nombreNuevo === "" || isNaN(precioNuevo)) {
-    mensajeFeedback.textContent = "⚠️ Completá el nombre y el precio antes de agregar.";
-    mensajeFeedback.style.color = "#e74c3c";
+    mostrarFeedback("⚠️ Completá el nombre y el precio antes de agregar.", true);
     return;
   }
 
@@ -47,9 +64,9 @@ botonAgregar.addEventListener("click", () => {
 
   productos.push(nuevoProducto);
   renderizarProductos(productos);
+  guardarEnStorage(productos);
 
-  mensajeFeedback.textContent = `✅ "${nombreNuevo}" agregado correctamente.`;
-  mensajeFeedback.style.color = "#27ae60";
+  mostrarFeedback(`✅ "${nombreNuevo}" agregado correctamente.`, false);
 
   inputNombre.value = "";
   inputPrecio.value = "";
@@ -63,9 +80,9 @@ contenedorItems.addEventListener("click", (evento) => {
 
     productos = productos.filter((producto) => producto.id !== idAEliminar);
     renderizarProductos(productos);
+    guardarEnStorage(productos);
 
-    mensajeFeedback.textContent = `🗑️ "${productoEliminado.nombre}" eliminado.`;
-    mensajeFeedback.style.color = "#e74c3c";
+    mostrarFeedback(`🗑️ "${productoEliminado?.nombre ?? "producto"}" eliminado.`, true);
   }
 });
 
