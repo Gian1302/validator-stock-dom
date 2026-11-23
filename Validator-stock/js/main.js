@@ -4,6 +4,7 @@ const inputPrecio = document.getElementById("input-precio");
 const botonAgregar = document.getElementById("boton-agregar");
 const inputBuscador = document.getElementById("input-buscador");
 const mensajeFeedback = document.getElementById("mensaje-feedback");
+const mensajeInfo = document.getElementById("mensaje-info");
 
 const CLAVE_STORAGE = "productosStock";
 
@@ -21,6 +22,20 @@ let productos = cargarDesdeStorage() ?? [
   { id: 2, nombre: "Arroz", precio: 1800 },
   { id: 3, nombre: "Jabón", precio: 900 },
 ];
+
+function obtenerProductosDesdeServidor() {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const fallo = Math.random() < 0.3;
+
+      if (fallo) {
+        reject(new Error("No se pudo conectar con el servidor"));
+      } else {
+        resolve(productos);
+      }
+    }, 2000);
+  });
+}
 
 function mostrarFeedback(mensaje, esError) {
   mensajeFeedback.textContent = mensaje;
@@ -95,3 +110,22 @@ inputBuscador.addEventListener("keyup", () => {
 
   renderizarProductos(productosFiltrados);
 });
+
+setTimeout(() => {
+  mensajeInfo.textContent = "🔔 Cotización del dólar hoy: $1200";
+}, 4000);
+
+async function cargarProductosIniciales() {
+  mostrarFeedback("⏳ Cargando productos...", false);
+
+  try {
+    const productosCargados = await obtenerProductosDesdeServidor();
+    mostrarFeedback(`✔️ ${productosCargados.length} productos cargados`, false);
+  } catch (error) {
+    mostrarFeedback("⚠️ No se pudo procesar la operación, intentá de nuevo", true);
+  } finally {
+    renderizarProductos(productos);
+  }
+}
+
+cargarProductosIniciales();
