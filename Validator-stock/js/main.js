@@ -5,6 +5,8 @@ const botonAgregar = document.getElementById("boton-agregar");
 const inputBuscador = document.getElementById("input-buscador");
 const mensajeFeedback = document.getElementById("mensaje-feedback");
 const mensajeInfo = document.getElementById("mensaje-info");
+const mensajeCargaApi = document.getElementById("mensaje-carga-api");
+const contenedorDestacados = document.getElementById("contenedor-destacados");
 
 const CLAVE_STORAGE = "productosStock";
 
@@ -128,4 +130,56 @@ async function cargarProductosIniciales() {
   }
 }
 
+function renderizarDestacados(lista) {
+  contenedorDestacados.innerHTML = "";
+
+  for (const item of lista) {
+    const { title, price } = item;
+
+    contenedorDestacados.innerHTML += `
+      <div class="item-producto">
+        <div>
+          <h3>${title}</h3>
+          <p>$${price}</p>
+        </div>
+      </div>
+    `;
+  }
+}
+
 cargarProductosIniciales();
+
+async function cargarProductosDestacados() {
+  mensajeCargaApi.textContent = "⏳ Cargando productos destacados...";
+
+  try {
+    const respuesta = await fetch("https://fakestoreapi.com/products?limit=5");
+
+    if (!respuesta.ok) {
+      throw new Error("La API respondió con un error");
+    }
+
+    const datos = await respuesta.json();
+    renderizarDestacados(datos);
+
+    Toastify({
+      text: "✅ Productos destacados cargados con éxito",
+      duration: 3000,
+      gravity: "top",
+      position: "right",
+      backgroundColor: "#27ae60",
+    }).showToast();
+  } catch (error) {
+    Toastify({
+      text: "❌ No se pudieron cargar los productos destacados",
+      duration: 3000,
+      gravity: "top",
+      position: "right",
+      backgroundColor: "#e74c3c",
+    }).showToast();
+  } finally {
+    mensajeCargaApi.textContent = "";
+  }
+}
+
+cargarProductosDestacados();
